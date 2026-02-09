@@ -1,9 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import scaniaLogo from "../assets/scanialogo.png";
 import tuttiBelliLogo from "../assets/tuttibelli-logo.png";
-import trees from "../data/trees.json";
 import { formatScientificName } from "../lib/formatters.js";
+import { fetchTreeById } from "../lib/firestore.js";
 
 const photoPlaceholders = [
   { id: 1, label: "Foto geral" },
@@ -14,8 +14,33 @@ const photoPlaceholders = [
 export default function TreeDetail() {
   const { id } = useParams();
   const [activePhoto, setActivePhoto] = useState(null);
+  const [tree, setTree] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
 
-  const tree = useMemo(() => trees.find((item) => item.id === id), [id]);
+  useEffect(() => {
+    let isActive = true;
+    const loadTree = async () => {
+      setIsLoading(true);
+      setLoadError("");
+      try {
+        const data = await fetchTreeById(id);
+        if (isActive) setTree(data);
+      } catch (error) {
+        if (isActive) {
+          setLoadError(
+            "Não foi possível carregar os dados da árvore. Tente novamente.",
+          );
+        }
+      } finally {
+        if (isActive) setIsLoading(false);
+      }
+    };
+    loadTree();
+    return () => {
+      isActive = false;
+    };
+  }, [id]);
 
   const openPhoto = (photo) => setActivePhoto(photo);
   const closePhoto = () => setActivePhoto(null);
@@ -27,7 +52,20 @@ export default function TreeDetail() {
         <div className="scania-title">Projeto de Reflorestamento Scania</div>
       </Link>
 
-      {tree ? (
+      {isLoading ? (
+        <header className="hero">
+          <div className="title-row">
+            <div>
+              <div className="title-meta">
+                <span className="eyebrow">Carregando dados</span>
+                <span className="inline-tag">ID {id}</span>
+              </div>
+              <h1>Buscando informações...</h1>
+            </div>
+          </div>
+          <p className="hero-copy">Aguarde um instante.</p>
+        </header>
+      ) : tree ? (
         <>
           <div className="detail-actions">
             <Link className="back-home" to="/">
@@ -123,15 +161,18 @@ export default function TreeDetail() {
           <div className="title-row">
             <div>
               <div className="title-meta">
-                <span className="eyebrow">Árvore não encontrada</span>
+                <span className="eyebrow">
+                  {loadError ? "Erro ao carregar" : "Árvore não encontrada"}
+                </span>
                 <span className="inline-tag">ID {id}</span>
               </div>
               <h1>Registro indisponível</h1>
             </div>
           </div>
           <p className="hero-copy">
-            Não encontramos uma árvore com essa tag. Volte ao catálogo para
-            selecionar outro registro.
+            {loadError
+              ? loadError
+              : "Não encontramos uma árvore com essa tag. Volte ao catálogo para selecionar outro registro."}
           </p>
         </header>
       )}

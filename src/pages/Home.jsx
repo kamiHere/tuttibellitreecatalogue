@@ -2,33 +2,60 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import scaniaLogo from "../assets/scanialogo.png";
 import tuttiBelliLogo from "../assets/tuttibelli-logo.png";
-import trees from "../data/trees.json";
 import { formatScientificName } from "../lib/formatters.js";
+import { fetchTrees } from "../lib/firestore.js";
 
 export default function Home() {
   const [query, setQuery] = useState("");
   const [locationFilter, setLocationFilter] = useState("Todas");
   const [speciesFilter, setSpeciesFilter] = useState("Todas");
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [trees, setTrees] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+
+  useEffect(() => {
+    let isActive = true;
+    const loadTrees = async () => {
+      setIsLoading(true);
+      setLoadError("");
+      try {
+        const data = await fetchTrees();
+        if (isActive) setTrees(data);
+      } catch (error) {
+        if (isActive) {
+          setLoadError(
+            "Não foi possível carregar os dados do catálogo. Tente novamente.",
+          );
+        }
+      } finally {
+        if (isActive) setIsLoading(false);
+      }
+    };
+    loadTrees();
+    return () => {
+      isActive = false;
+    };
+  }, []);
 
   const locations = useMemo(() => {
     const unique = new Set(trees.map((tree) => tree.location));
     return ["Todas", ...Array.from(unique).sort()];
-  }, []);
+  }, [trees]);
 
   const species = useMemo(() => {
     const unique = new Set(
       trees.map((tree) => tree.commonName).filter(Boolean)
     );
     return ["Todas", ...Array.from(unique).sort()];
-  }, []);
+  }, [trees]);
 
   const speciesCount = useMemo(() => {
     const unique = new Set(
       trees.map((tree) => tree.commonName?.toLowerCase()).filter(Boolean)
     );
     return unique.size;
-  }, []);
+  }, [trees]);
 
   const filteredTrees = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -45,7 +72,7 @@ export default function Home() {
           .some((value) => value.toLowerCase().includes(normalized))
       );
     });
-  }, [query, locationFilter, speciesFilter]);
+  }, [query, locationFilter, speciesFilter, trees]);
 
   const scrollPageToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -104,15 +131,15 @@ export default function Home() {
             <ul>
               <li>
                 <span>Total de árvores</span>
-                <strong>{trees.length}</strong>
+                <strong>{isLoading ? "-" : trees.length}</strong>
               </li>
               <li>
                 <span>Espécies registradas</span>
-                <strong>{speciesCount}</strong>
+                <strong>{isLoading ? "-" : speciesCount}</strong>
               </li>
               <li>
                 <span>Locais monitorados</span>
-                <strong>{locations.length - 1}</strong>
+                <strong>{isLoading ? "-" : locations.length - 1}</strong>
               </li>
             </ul>
             <p className="meta">Atualização: Fevereiro de 2026</p>
@@ -140,7 +167,9 @@ export default function Home() {
             <div>
               <h3>Lista completa de árvores</h3>
               <p className="muted">
-                {filteredTrees.length} resultados encontrados de {trees.length}.
+                {isLoading
+                  ? "Carregando registros..."
+                  : `${filteredTrees.length} resultados encontrados de ${trees.length}.`}
               </p>
             </div>
             <div className="filters">
@@ -187,25 +216,32 @@ export default function Home() {
 
           <div className="tree-scroll">
             <div className="tree-grid">
-            {filteredTrees.map((tree) => (
-              <article key={tree.id} className="tree-card">
-                <div className="tree-header">
-                  <span className="tree-id">ID {tree.id}</span>
-                  <span className="tree-location">{tree.location}</span>
-                </div>
-                <h4>{tree.commonName}</h4>
-                <span className="scientific-name">
-                  {formatScientificName(tree.scientificName)}
-                </span>
-                <Link
-                  className="tree-link"
-                  to={`/arvore/${tree.id}`}
-                  onClick={handleCardClick}
-                >
-                  Ver ficha da árvore
-                </Link>
+            {loadError ? (
+              <article className="card info">
+                <h3>Erro ao carregar</h3>
+                <p>{loadError}</p>
               </article>
-            ))}
+            ) : (
+              filteredTrees.map((tree) => (
+                <article key={tree.id} className="tree-card">
+                  <div className="tree-header">
+                    <span className="tree-id">ID {tree.id}</span>
+                    <span className="tree-location">{tree.location}</span>
+                  </div>
+                  <h4>{tree.commonName}</h4>
+                  <span className="scientific-name">
+                    {formatScientificName(tree.scientificName)}
+                  </span>
+                  <Link
+                    className="tree-link"
+                    to={`/arvore/${tree.id}`}
+                    onClick={handleCardClick}
+                  >
+                    Ver ficha da árvore
+                  </Link>
+                </article>
+              ))
+            )}
             </div>
           </div>
 

@@ -18,6 +18,9 @@ pnpm-debug.log*
 .env
 .env.*
 
+# Firebase service account keys
+*-firebase-adminsdk-*.json
+
 # Editor directories and files
 .idea/
 .vscode/
