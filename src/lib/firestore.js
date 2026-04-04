@@ -8,6 +8,7 @@ const normalizeTree = (tree) => ({
   commonName: tree.commonName ?? "",
   scientificName: tree.scientificName ?? "",
   location: tree.location ?? "",
+  details: tree.details ?? "",
 });
 
 export const fetchTrees = async () => {
@@ -33,3 +34,4 @@ export const fetchTreeById = async (id) => {
     throw error;
   }
 };
+

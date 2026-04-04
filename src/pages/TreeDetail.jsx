@@ -8,7 +8,7 @@ import { fetchTreeById } from "../lib/firestore.js";
 const photoPlaceholders = [
   { id: 1, label: "Foto geral" },
   { id: 2, label: "Foto da placa" },
-  { id: 3, label: "+ fotos", isAdd: true },
+  { id: 3, label: "+ Fotos", isAdd: true },
 ];
 
 export default function TreeDetail() {
@@ -113,10 +113,12 @@ export default function TreeDetail() {
                     <span>Localização</span>
                     <strong>{tree.location}</strong>
                   </li>
-                  <li>
-                    <span>Termo de Compromisso de Recuperação Ambiental</span>
-                    <strong>TCRA Nº 3549/2024</strong>
-                  </li>
+                  {tree.details ? (
+                    <li>
+                      <span>Detalhes</span>
+                      <strong>{tree.details}</strong>
+                    </li>
+                  ) : null}
                 </ul>
                 <p className="meta">Atualização: Fevereiro de 2026</p>
               </article>

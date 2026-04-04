@@ -17,6 +17,14 @@ const serviceAccountPath =
 
 const collectionName = process.env.FIRESTORE_COLLECTION || "trees";
 const dataPath = path.resolve("src", "data", "treesMap.json");
+const processDetails = "TCRA - 3549/2024";
+const getTreeDetails = (id) => {
+  const numericId = Number.parseInt(id, 10);
+  if (Number.isNaN(numericId)) {
+    return undefined;
+  }
+  return numericId >= 1 && numericId <= 305 ? processDetails : undefined;
+};
 
 if (!fs.existsSync(dataPath)) {
   throw new Error(`Data file not found: ${dataPath}`);
@@ -66,7 +74,7 @@ const commitBatch = async () => {
 
 for (const [id, doc] of entries) {
   const docRef = collection.doc(id);
-  batch.set(docRef, { id, ...doc });
+  batch.set(docRef, { id, ...doc, details: getTreeDetails(id) });
   opCount += 1;
   total += 1;
 
@@ -84,3 +92,4 @@ if (opCount > 0) {
 console.log(
   `Imported ${total} documents into ${collectionName} in project ${db.projectId || "unknown"}.`,
 );
+
