@@ -112,7 +112,6 @@ export default function Home() {
           <div>
             <div className="title-meta">
               <span className="eyebrow">Catálogo digital</span>
-              <span className="inline-tag">TCRA Nº 3549/2024</span>
             </div>
             <h1>Inventário completo de árvores</h1>
           </div>

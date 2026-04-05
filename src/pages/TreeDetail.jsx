@@ -49,7 +49,7 @@ export default function TreeDetail() {
     <div className="page">
       <Link className="scania-header" to="/home">
         <img src={scaniaLogo} alt="Scania" />
-        <div className="scania-title">Projeto de Reflorestamento Scania</div>
+        <div className="scania-title">PROJETO DE COMPENSAÇÃO AMBIENTAL SCANIA</div>
       </Link>
 
       {isLoading ? (
