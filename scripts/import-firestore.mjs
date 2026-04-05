@@ -74,7 +74,12 @@ const commitBatch = async () => {
 
 for (const [id, doc] of entries) {
   const docRef = collection.doc(id);
-  batch.set(docRef, { id, ...doc, details: getTreeDetails(id) });
+  const details = getTreeDetails(id);
+  batch.set(
+    docRef,
+    details ? { id, ...doc, details } : { id, ...doc, details: admin.firestore.FieldValue.delete() },
+    { merge: true },
+  );
   opCount += 1;
   total += 1;
 
