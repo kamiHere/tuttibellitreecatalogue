@@ -102,7 +102,7 @@ export default function Home() {
 
   return (
     <div className="page">
-      <Link className="scania-header" to="/">
+      <Link className="scania-header" to="/home">
         <img src={scaniaLogo} alt="Scania" />
         <div className="scania-title">Projeto de Reflorestamento Scania</div>
       </Link>
@@ -234,7 +234,7 @@ export default function Home() {
                   </span>
                   <Link
                     className="tree-link"
-                    to={`/arvore/${tree.id}`}
+                    to={`/${tree.id}`}
                     onClick={handleCardClick}
                   >
                     Ver ficha da árvore

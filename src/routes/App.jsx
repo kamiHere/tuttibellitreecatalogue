@@ -5,9 +5,9 @@ import TreeDetail from "../pages/TreeDetail.jsx";
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/arvore/:id" element={<TreeDetail />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/home" element={<Home />} />
+      <Route path="/:id" element={<TreeDetail />} />
+      <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
   );
 }

@@ -47,7 +47,7 @@ export default function TreeDetail() {
 
   return (
     <div className="page">
-      <Link className="scania-header" to="/">
+      <Link className="scania-header" to="/home">
         <img src={scaniaLogo} alt="Scania" />
         <div className="scania-title">Projeto de Reflorestamento Scania</div>
       </Link>
@@ -68,7 +68,7 @@ export default function TreeDetail() {
       ) : tree ? (
         <>
           <div className="detail-actions">
-            <Link className="back-home" to="/">
+            <Link className="back-home" to="/home">
               Retornar ao início
             </Link>
           </div>
