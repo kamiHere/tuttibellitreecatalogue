@@ -8,6 +8,7 @@
     "build": "vite build --outDir public",
     "deploy": "firebase deploy",
     "preview": "vite preview",
+    "generate:data": "node scripts/generate-tree-data.mjs",
     "import:firestore": "node scripts/import-firestore.mjs"
   },
   "dependencies": {
